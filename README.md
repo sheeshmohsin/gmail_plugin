@@ -8,7 +8,8 @@ Configuring This Package
 
 First install libnotify package using this command:-
 
-  . .
-  . . yum install libnotify
+::
+    
+    yum install libnotify
 
 Then Run the gmailnotification.py file with python.
