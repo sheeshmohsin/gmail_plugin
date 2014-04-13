@@ -7,6 +7,7 @@ import urllib2
 import subprocess
 import ConfigParser
 from bs4 import BeautifulSoup
+from os.path import expanduser
 
 
 FEED_URL = 'https://mail.google.com/mail/feed/atom'
@@ -38,6 +39,27 @@ def internet_on():
     return subprocess.call(['/bin/ping', '-c1', 'google.com'])
 
 
+def updatecredentials():
+    home = expanduser("~")
+    homefile = os.path.join(home, '.gmailnotf.ini')
+    if os.path.exists(homefile):
+        updateconfig = ConfigParser.RawConfigParser()
+        updateconfig.read(homefile)
+        username = updateconfig.get(updateconfig.sections()[0], updateconfig.options(updateconfig.sections()[0])[0])
+        password = updateconfig.get(updateconfig.sections()[0], updateconfig.options(updateconfig.sections()[0])[1])
+        changeconfig = ConfigParser.RawConfigParser()
+        conpath = sys.path[0]
+        configpath = os.path.join(conpath, 'config.ini')
+        changeconfig.read(configpath)
+        changeconfig.sections()
+        changeconfig.set('SectionOne', 'username', username)
+        changeconfig.set('SectionOne', 'password', password)
+        with open(configpath, 'wb') as configfile:
+            changeconfig.write(configfile)
+    else:
+        return
+
+
 class Gmailnotification:
 
     def __init__(self, user, passwd, previousnumber):
@@ -53,11 +75,8 @@ class Gmailnotification:
         )
         opener = urllib2.build_opener(auth_handler)
         urllib2.install_opener(opener)
-        try:
-            feed = urllib2.urlopen(FEED_URL)
-            self.parsingfullcount(feed, previousnumber)
-        except:
-            return
+        feed = urllib2.urlopen(FEED_URL)
+        self.parsingfullcount(feed, previousnumber)
 
     def parsingfullcount(self, feed, previousnumber):
         soup = BeautifulSoup(feed.read())
@@ -70,12 +89,13 @@ class Gmailnotification:
         if int(number) == int(previousnumber):
             self.dontshowpopup(number)
         else:
-            self.showpopup(number)
+            self.showpopup(number, message)
 
     def dontshowpopup(self, number):
         self.value = number
+        self.updateconfig(number)
 
-    def showpopup(self, number):
+    def showpopup(self, number, message):
         nomessage = "No unread mails in your gmail inbox"
         if number == 0:
             subprocess.Popen(['notify-send', nomessage])
@@ -92,8 +112,10 @@ class Gmailnotification:
         self.editconfig.set('SectionOne', 'previousnumber', number)
         with open(self.basefile, 'wb') as configfile:
             self.editconfig.write(configfile)
+        return
 
 if __name__ == "__main__":
+    updatecredentials()
     while True:
         if internet_on() == 0:
             user = ConfigSectionMap("SectionOne")['username']
