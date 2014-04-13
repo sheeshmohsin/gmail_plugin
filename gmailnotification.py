@@ -35,11 +35,7 @@ def ConfigSectionMap(section):
 
 
 def internet_on():
-    try:
-        response = urllib2.urlopen('http://www.google.com')
-        return True
-    except:
-        return False
+    return subprocess.call(['/bin/ping', '-c1', 'google.com'])
 
 
 class Gmailnotification:
@@ -50,10 +46,10 @@ class Gmailnotification:
     def getnumberofmessage(self, user, passwd, previousnumber):
         auth_handler = urllib2.HTTPBasicAuthHandler()
         auth_handler.add_password(
-            realm = 'New mail feed',
-            uri = 'https://mail.google.com',
-            user = '{user}@gmail.com'.format(user=user),
-            passwd = passwd
+            realm='New mail feed',
+            uri='https://mail.google.com',
+            user='{user}@gmail.com'.format(user=user),
+            passwd=passwd
         )
         opener = urllib2.build_opener(auth_handler)
         urllib2.install_opener(opener)
@@ -71,15 +67,22 @@ class Gmailnotification:
         self.sendmessage(unreadmessages, number, previousnumber)
 
     def sendmessage(self, message, number, previousnumber):
-        nomessage = "No unread mails in your gmail inbox"
-        if number == int(previousnumber):
-            return
+        if int(number) == int(previousnumber):
+            self.dontshowpopup(number)
         else:
-            if number == 0:
-                subprocess.Popen(['notify-send', nomessage])
-            else:
-                subprocess.Popen(['notify-send', message])
-                self.updateconfig(number)
+            self.showpopup(number)
+
+    def dontshowpopup(self, number):
+        self.value = number
+
+    def showpopup(self, number):
+        nomessage = "No unread mails in your gmail inbox"
+        if number == 0:
+            subprocess.Popen(['notify-send', nomessage])
+            self.updateconfig(number)
+        else:
+            subprocess.Popen(['notify-send', message])
+            self.updateconfig(number)
 
     def updateconfig(self, number):
         self.cwd = sys.path[0]
@@ -92,7 +95,7 @@ class Gmailnotification:
 
 if __name__ == "__main__":
     while True:
-        if internet_on():
+        if internet_on() == 0:
             user = ConfigSectionMap("SectionOne")['username']
             passwd = ConfigSectionMap("SectionOne")['password']
             previousnumber = ConfigSectionMap("SectionOne")['previousnumber']
@@ -100,3 +103,4 @@ if __name__ == "__main__":
             time.sleep(300)
         else:
             time.sleep(30)
+
