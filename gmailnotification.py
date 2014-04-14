@@ -90,10 +90,12 @@ class Gmailnotification:
     def showpopup(self, number, message):
         nomessage = "No unread mails in your gmail inbox"
         if number == 0:
-            subprocess.Popen(['notify-send', nomessage])
+            self.icon = os.path.join(sys.path[0], 'gmail.png')
+            subprocess.Popen(['notify-send', nomessage, '-i', self.icon])
             self.updateconfig(number)
         else:
-            subprocess.Popen(['notify-send', message])
+            self.icon = os.path.join(sys.path[0], 'gmail.png')
+            subprocess.Popen(['notify-send', message, '-i', self.icon])
             self.updateconfig(number)
 
     def updateconfig(self, number):
