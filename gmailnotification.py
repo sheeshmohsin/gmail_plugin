@@ -13,14 +13,6 @@ from os.path import expanduser
 FEED_URL = 'https://mail.google.com/mail/feed/atom'
 
 
-cwd = sys.path[0]
-basefile = os.path.join(cwd, 'config.ini')
-
-
-Config = ConfigParser.ConfigParser()
-Config.read(basefile)
-
-
 def ConfigSectionMap(section):
     values = {}
     options = Config.options(section)
@@ -86,14 +78,14 @@ class Gmailnotification:
         self.sendmessage(unreadmessages, number, previousnumber)
 
     def sendmessage(self, message, number, previousnumber):
-        if int(number) == int(previousnumber):
-            self.dontshowpopup(number)
+        diff = int(number) - int(previousnumber)
+        if int(diff) == 0:
+            self.dontshowpopup(message, number, previousnumber)
         else:
             self.showpopup(number, message)
 
-    def dontshowpopup(self, number):
+    def dontshowpopup(self, message, number, previousnumber):
         self.value = number
-        self.updateconfig(number)
 
     def showpopup(self, number, message):
         nomessage = "No unread mails in your gmail inbox"
@@ -118,11 +110,15 @@ if __name__ == "__main__":
     updatecredentials()
     while True:
         if internet_on() == 0:
+            cwd = sys.path[0]
+            basefile = os.path.join(cwd, 'config.ini')
+            Config = ConfigParser.ConfigParser()
+            Config.read(basefile)
             user = ConfigSectionMap("SectionOne")['username']
             passwd = ConfigSectionMap("SectionOne")['password']
             previousnumber = ConfigSectionMap("SectionOne")['previousnumber']
             d = Gmailnotification(user, passwd, previousnumber)
-            time.sleep(300)
+            time.sleep(60)
         else:
             time.sleep(30)
 
