@@ -120,7 +120,7 @@ if __name__ == "__main__":
             passwd = ConfigSectionMap("SectionOne")['password']
             previousnumber = ConfigSectionMap("SectionOne")['previousnumber']
             d = Gmailnotification(user, passwd, previousnumber)
-            time.sleep(60)
+            time.sleep(300)
         else:
             time.sleep(30)
 

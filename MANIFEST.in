@@ -1,0 +1,5 @@
+include *.py
+include README.md
+include *.ini
+include LICENSE
+include *.png
