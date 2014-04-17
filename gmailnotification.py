@@ -8,6 +8,21 @@ import subprocess
 import ConfigParser
 from bs4 import BeautifulSoup
 from os.path import expanduser
+import dbus
+
+
+item              = "org.freedesktop.Notifications"
+path              = "/org/freedesktop/Notifications"
+interface         = "org.freedesktop.Notifications"
+app_name          = "Gmail Plugin"
+id_num_to_replace = 0
+icon              = os.path.join(sys.path[0], 'gmail.png')
+title             = "Gmail"
+actions_list      = ''
+hint              = ''
+bus = dbus.SessionBus()
+notif = bus.get_object(item, path)
+notify = dbus.Interface(notif, interface)
 
 
 FEED_URL = 'https://mail.google.com/mail/feed/atom'
@@ -74,7 +89,7 @@ class Gmailnotification:
         soup = BeautifulSoup(feed.read())
         number = soup.fullcount.string
         number = int(number)
-        unreadmessages = "You have %d unread mails in your gmail inbox" % int(number)
+        unreadmessages = "You have %d unread mails" % int(number)
         self.sendmessage(unreadmessages, number, previousnumber)
 
     def sendmessage(self, message, number, previousnumber):
@@ -88,14 +103,16 @@ class Gmailnotification:
         self.value = number
 
     def showpopup(self, number, message):
-        nomessage = "No unread mails in your gmail inbox"
+        nomessage = "No unread mails"
         if number == 0:
-            self.icon = os.path.join(sys.path[0], 'gmail.png')
-            subprocess.Popen(['notify-send', nomessage, '-i', self.icon])
+            text = nomessage
+            time = 5000
+            notify.Notify(app_name, id_num_to_replace, icon, title, text, actions_list, hint, time)
             self.updateconfig(number)
         else:
-            self.icon = os.path.join(sys.path[0], 'gmail.png')
-            subprocess.Popen(['notify-send', message, '-i', self.icon])
+            text = message
+            time = 5000
+            notify.Notify(app_name, id_num_to_replace, icon, title, text, actions_list, hint, time)
             self.updateconfig(number)
 
     def updateconfig(self, number):
