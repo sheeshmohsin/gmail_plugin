@@ -6,11 +6,7 @@ This package show notification on your system if new mail is received in your gm
 Configuring This Package
 ------------------------
 
-First install libnotify package using this command:-
-    
-    yum install libnotify
-
-Then clone this repository using this command:-
+Clone this repository using this command:-
     
     git clone https://github.com/sheeshmohsin/gmail_plugin
 
