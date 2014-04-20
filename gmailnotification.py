@@ -2,13 +2,13 @@
 
 import os
 import sys
+import dbus
 import time
 import urllib2
 import subprocess
 import ConfigParser
 from bs4 import BeautifulSoup
 from os.path import expanduser
-import dbus
 
 
 item              = "org.freedesktop.Notifications"
