@@ -10,6 +10,14 @@ Clone this repository using this command:-
     
     git clone https://github.com/sheeshmohsin/gmail_plugin
 
+Now, change into the directory `gmail_plugin` using this command:-
+    
+    cd gmail_plugin
+
+And run this command:-
+    
+    sudo pip install -r requirements.txt
+
 Add username and password of your gmail account in a file named as `.gmailnotf.ini` in the format given below:-
 
     [Gmail]
